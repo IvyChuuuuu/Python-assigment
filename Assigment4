@@ -1,0 +1,17 @@
+# Try to find a twin prime, which is a prime that has a prime gap of two.
+while True:
+    n = int(input("請輸入一個整數："))
+    for i in range (2,n):
+        if n % i == 0:
+            print(str(n) + "不是質數")
+            break
+        else:
+            if (n+2) % i != 0:
+                print(f"你找到了一對孿生質數:{n}及{n+2}")
+                break
+            else:
+                print(f"{n}沒有孿生質數")
+                break
+
+    if n == 2:
+        print(f"{n}是質數，但沒有孿生質數")
