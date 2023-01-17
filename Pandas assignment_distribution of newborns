@@ -1,0 +1,25 @@
+import pandas as pd
+df = pd.read_csv("	https://data.moi.gov.tw/MoiOD/System/DownloadFile.aspx?DATA=0B86BE82-0BBC-4CCC-913E-26CD2C6FD29B")
+df2 = df.iloc[1:] 
+#No data in the first row
+df2["city"] = df2["site_id"].apply(lambda addr : addr[0:3]) 
+df2["birth_count"] = df2["birth_count"].astype("int")
+
+df3 = df2.groupby("city").sum()
+df3["ratio"] = df3["birth_count"]*100 / df3["birth_count"].sum()
+
+df4 = df3.sort_values("ratio", ascending=False)
+
+import matplotlib.pyplot as plt
+from matplotlib.font_manager import FontProperties
+plt.style.use("ggplot")
+
+plt.rcParams["figure.figsize"] = (20,6)
+
+plt.rcParams["font.sans-serif"] = ["Microsoft JhengHei"]
+plt.bar(df4.index, df4["ratio"])
+plt.yticks(fontsize=14)
+plt.ylabel("ratio")
+plt.xlabel("city")
+plt.title("Distribution of Newborns in Taiwan")
+plt.show()
