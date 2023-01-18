@@ -1,74 +1,92 @@
-import random
+while True:
+    import random
 
-# 輸入撲克牌
-cards = [11,2,3,4,5,6,7,9,10,10,10,10] * 4
+    # 建立撲克牌
+    cards = [11,2,3,4,5,6,7,9,10,10,10,10] * 4
 
-# 發牌
+    # 發牌
+    def deal_card():
+        card = random.choice(cards)
+        cards.remove(card)
+        return card
 
-def deal_card():
-    card = random.choice(cards)
-    cards.remove(card)
-    return card
+    user_cards = []
+    dealer_cards = []
 
-user_cards = []
-dealer_cards = []
+    user_points = ""
+    dealer_points = ""
 
-user_points = ""
-dealer_points = ""
-
-
-for i in range(0,2):
-    user_cards.append(deal_card())
-    dealer_cards.append(deal_card())
-print(f"玩家的牌：{user_cards}")
-print(f"莊家的明牌：{dealer_cards[1]}")
-
-# 計算點數
-
-def calculate_points(cards):
-    total_points = sum(cards)
-    # 如果只有兩張卡，A當作11點
-    if len(cards) == 2:
-        return total_points
-    # 有兩張卡以上且點數爆掉，A要當作1點
-    if total_points > 21:
-        if 11 in cards:
-            cards.remove(11)
-            cards.append(1)
+    # 計算點數，如果牌組中有A且點數大於21，A自動換算為1
+    def calculate_points(cards):
+        total_points = sum(cards)
+        if total_points > 21:
+            if 11 in cards:
+                cards.remove(11)
+                cards.append(1)
+                total_points = sum(cards)
+                return total_points
+            else:
+                total_points = sum(cards)
+                return total_points
+        else:
             total_points = sum(cards)
             return total_points
 
-# 玩家
-while True:
-    more_card = input("是否要再加牌? y/n: ")
-    if more_card == "y":
+    # 以下開始遊戲              
+    # 隨機發給玩家和莊家兩張牌
+    for i in range(0,2):
         user_cards.append(deal_card())
-        user_points = calculate_points(user_cards)
-        print(f"玩家的牌：{user_cards}")
-                
-    else:
-        user_points = calculate_points(user_cards)
-        print(f"玩家的牌：{user_cards}")
-        break
-
-# 莊家
-
-dealer_points = calculate_points(dealer_cards)
-while True:
-    if dealer_points < 17:
         dealer_cards.append(deal_card())
-        dealer_points = calculate_points(dealer_cards)
-        print(f"莊家的牌：{dealer_cards}")
-    else:
-        dealer_points = calculate_points(dealer_cards)
-        print(f"莊家的牌：{dealer_cards}")
-        break
+    print(f"玩家的牌：{user_cards}")
+    print(f"莊家的明牌：{dealer_cards[1]}")        
 
-if user_points > 21:
-    print("您輸了!")
-elif user_points > dealer_points and 21 >= user_points:
-    print("您贏了!")
-elif dealer_points > 21:
-    print("您贏了!")
-else:
-    print("您輸了!")
+    # 詢問玩家是否加牌
+    while True:
+        more_card = input("是否要再加牌? y/n: ")
+        if more_card == "y":
+            user_cards.append(deal_card())
+            user_points = calculate_points(user_cards)
+            if user_points > 21:
+                print(f"玩家的牌：{user_cards}, 共{user_points}點")
+                break
+            else:
+                print(f"玩家的牌：{user_cards}, 共{user_points}點")
+
+        else:
+            user_points = calculate_points(user_cards)
+            print(f"玩家的牌：{user_cards}, 共{user_points}點")
+            break
+
+    # 莊家的點數若不足17點必須加牌，直到點數超過或等於17點
+    dealer_points = calculate_points(dealer_cards)
+    while True:
+        if dealer_points < 17:
+            dealer_cards.append(deal_card())
+            dealer_points = calculate_points(dealer_cards)
+            break
+
+    print(f"莊家的牌：{dealer_cards}, 共{dealer_points}點")
+
+    # 判斷輸贏
+    if user_points > 21:
+        print("您輸了!")
+    elif dealer_points > 21:
+        print("您贏了!")
+    elif user_points > dealer_points:
+        print("您贏了!")
+    elif user_points == dealer_points:
+        print("平手!")
+    else:
+        print("您輸了!")
+        
+    while True:
+        keep_play = input("想要再玩一次嗎？ Y) 是 N) 否：")
+        if keep_play in ["Y", "y", "N", "n"]:
+            break
+        else:
+            print("請輸入合法的選項！")
+
+    if keep_play.upper() == "N":
+        break
+        
+print("感謝您玩21點！")
