@@ -1,0 +1,35 @@
+# 完整版
+
+from bs4 import BeautifulSoup as BS
+import xlwings as xw
+import requests
+import time
+
+def us_stock_crawler(sid):
+    res = requests.get(f"https://finance.yahoo.com/quote/{sid}/")
+    html = BS(res.text, "html.parser")
+    name_list = html.findAll("h1", {"class":"D(ib)"})
+    company = name_list[0].text
+
+    close_price = html.findAll("fin-streamer", {"class":"Fw(b) Fz(36px) Mb(-4px) D(ib)"},)
+    close_price = close_price[0].text
+
+    open_price = html.findAll("td", {"class":"Ta(end) Fw(600) Lh(14px)"},
+                       {"data-test":"OPEN-value"})
+    open_price = open_price[1].text
+    
+    result = [company,open_price, close_price ]
+    
+    return result
+
+wb = xw.Book("US_Stock_Portfolio.xlsx")
+sheet = wb.sheets["tracker"]
+while True:
+    last_row = sheet.range("A1").end("down").row
+    for i in range(2, last_row+1):
+        sid = sheet.range(f"A{i}").value
+        result = us_stock_crawler(sid)
+        sheet.range(f"B{i}").value = result[0]
+        sheet.range(f"C{i}").value = result[1]
+        sheet.range(f"D{i}").value = result[2]
+    time.sleep(10)
